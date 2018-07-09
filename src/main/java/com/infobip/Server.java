@@ -1,5 +1,6 @@
 package com.infobip;
 
+import org.apache.commons.io.FileUtils;
 import org.smpp.*;
 import org.smpp.pdu.PDU;
 import org.smpp.pdu.Request;
@@ -29,20 +30,19 @@ public class Server {
             receiver.start();
 
             try {
-                PDU req;
+                PDU pdu;
                 do {
-                    req = receiver.receive(100);
-                    if (req == null)
+                    pdu = receiver.receive(100);
+                    if (pdu == null)
                         continue;
 
-                    System.out.println("Got: " + req.debugString());
+                    Request req = Request.class.cast(pdu);
+                    Response resp = req.getResponse();
 
-                    Response resp = Request.class.cast(req).getResponse();
-                    if (resp != null) {
-                        transmitter.send(req);
-                        System.out.println("Responded: " + resp.debugString());
-                    }
-                } while (req != null && req.getCommandId() != Data.UNBIND);
+                    handle(req, resp);
+
+                    transmitter.send(resp);
+                } while (pdu != null && pdu.getCommandId() != Data.UNBIND);
             } catch (Exception ex) {
                 ex.printStackTrace();
             } finally {
@@ -53,6 +53,14 @@ public class Server {
                 } catch (IOException ignored) {
                 }
             }
+        }
+
+        private void handle(Request req, Response resp) throws Exception {
+            System.out.println("Req: " + req.debugString());
+            System.out.println("Resp: " + resp.debugString());
+
+            FileUtils.writeByteArrayToFile(FileUtils.getFile("logs/received.log"), req.getData().getBuffer(), true);
+            FileUtils.writeByteArrayToFile(FileUtils.getFile("logs/sent.log"), resp.getData().getBuffer(), true);
         }
     }
 }
