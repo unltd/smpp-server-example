@@ -2,6 +2,8 @@ package com.infobip;
 
 import org.smpp.*;
 import org.smpp.pdu.PDU;
+import org.smpp.pdu.Request;
+import org.smpp.pdu.Response;
 
 import java.io.IOException;
 
@@ -35,23 +37,8 @@ public class Server {
 
                     System.out.println("Got: " + pdu.debugString());
 
-                    PDU resp = null;
-                    switch (pdu.getCommandId()) {
-                        case Data.ENQUIRE_LINK:
-                            resp = PDU.createPDU(Data.ENQUIRE_LINK_RESP);
-                            break;
-
-                        case Data.SUBMIT_SM:
-                            resp = PDU.createPDU(Data.SUBMIT_SM_RESP);
-                            break;
-
-                        case Data.UNBIND:
-                            resp = PDU.createPDU(Data.UNBIND_RESP);
-                            break;
-                    }
-
+                    Response resp = Request.class.cast(pdu).getResponse();
                     if (resp != null) {
-                        resp.setSequenceNumber(pdu.getSequenceNumber());
                         transmitter.send(pdu);
                         System.out.println("Responded: " + resp.debugString());
                     }
