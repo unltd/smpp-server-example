@@ -29,20 +29,20 @@ public class Server {
             receiver.start();
 
             try {
-                PDU pdu;
+                PDU req;
                 do {
-                    pdu = receiver.receive(100);
-                    if (pdu == null)
+                    req = receiver.receive(100);
+                    if (req == null)
                         continue;
 
-                    System.out.println("Got: " + pdu.debugString());
+                    System.out.println("Got: " + req.debugString());
 
-                    Response resp = Request.class.cast(pdu).getResponse();
+                    Response resp = Request.class.cast(req).getResponse();
                     if (resp != null) {
-                        transmitter.send(pdu);
+                        transmitter.send(req);
                         System.out.println("Responded: " + resp.debugString());
                     }
-                } while (pdu != null && pdu.getCommandId() != Data.UNBIND);
+                } while (req != null && req.getCommandId() != Data.UNBIND);
             } catch (Exception ex) {
                 ex.printStackTrace();
             } finally {
