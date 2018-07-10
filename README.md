@@ -2,7 +2,7 @@
 
 SMPP Server that logs all the traffic to files.
 
-Uses blocking IO and does not scale very well. The task is to rewrite it using Cloudhopper SMPP library (commented out in pom.xml).
+The task is to rewrite it using Cloudhopper SMPP library (commented out in pom.xml).
 Here are CouldHopper examples:
 * https://github.com/twitter/cloudhopper-smpp/blob/master/src/test/java/com/cloudhopper/smpp/demo/SimulatorMain.java
 * https://github.com/twitter/cloudhopper-smpp/blob/master/src/test/java/com/cloudhopper/smpp/demo/SlowServerMain.java
