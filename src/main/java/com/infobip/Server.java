@@ -46,11 +46,16 @@ Rewrite the service to scale better, using Cloudhopper library (commented out in
 
 public class Server {
     private static final Logger log = LoggerFactory.getLogger(Server.class);
+
+    // binary log files as in the given example
     private static final File RECEIVED_LOG_FILE = FileUtils.getFile("logs/received.log");
     private static final File SENT_LOG_FILE = FileUtils.getFile("logs/sent.log");
 
     private final DefaultSmppServer smppServer;
+
+    // logs pdu in the binary format
     private final BiConsumer<PduRequest, PduResponse> pduLogger;
+    // helps to encode PDU into binary format
     private static final PduTranscoder TRANSCODER = new DefaultPduTranscoder(new DefaultPduTranscoderContext());
 
     public Server(BiConsumer<PduRequest, PduResponse> pduLogger) {
@@ -79,10 +84,11 @@ public class Server {
     }
 
     public static void main(String[] args) throws Exception {
-
+        // ensure files can be written and all necessary directories created
         FileUtils.touch(RECEIVED_LOG_FILE);
         FileUtils.touch(SENT_LOG_FILE);
 
+        // a single-thread executor handles binary logging
         ExecutorService pduLoggerExecutor = Executors.newSingleThreadExecutor(
                 new ThreadFactoryBuilder().setNameFormat("PduLogger")
                         .setDaemon(true)
